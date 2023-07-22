@@ -8,23 +8,89 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-    
-    <div class="box" id="heading">
-        <h1>To-Do List</h1>
-    </div>
+    <div class="container">
 
-    <div class="box">
-
-        <div class="item">
-            <ul id="todo-list">
-                
-            </ul>
+        <div class="left-half">
+            <div class="left_box">
+                <h2>Categories</h2>
+                <ul id="category-list">
+                </ul>
+            </div>
         </div>
 
-        <form class="item" id="input-form">
-            <input type="text" name="newItem" placeholder="Add Item" autocomplete="off" id="input">
-            <button type="submit" name="button" class="add_button">+</button>
-        </form>
+
+        <div class="right-half">
+            <div class="box" id="heading">
+                <h1>To-Do List</h1>
+            </div>
+        
+            <div class="box">
+                
+                <form class="item" id="input-form">
+                    <input type="text" name="newItem" placeholder="Add a new task" autocomplete="off" id="input">
+                    <div class="task_functions">
+                        <div class="c1_taskfunc">
+                            Due Date
+                            <input type="date" id="inputDueDate">
+                        </div>
+                        <div class="c1_taskfunc">
+                            <input type="text" id="category" placeholder="Add category">
+                        </div>
+                        <div class="c1_taskfunc">
+                            Priority
+                            <select id="priority-dropdown" name = "priority">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                              </select>
+                        </div>
+                        <div class="c1_taskfunc">
+                            <button type="submit" name="button" class="add_button">+</button>
+                        </div>
+                        
+                    </div>
+                    
+                </form>
+            </div>
+
+            <div class="box">
+                
+                <div class="filters">
+                    <label for="dueDateFrom">From:</label>
+                    <input type="date" id="dueDateFrom">
+                    
+                    <label for="dueDateTo">To:</label>
+                    <input type="date" id="dueDateTo">
+                    
+                    <label for="categoryFilter">Category:</label>
+                    <input type="text" id="categoryFilter">
+                    
+                    <label for="priorityFilter">Priority:</label>
+                    <select id="priorityFilter">
+                      <option value="">All Priorities</option>
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </select>
+                    
+                    <button id="filterBtn">Filter</button>
+                    <button id="unfilterBtn">Unfilter</button>
+                  </div>
+
+                <div class="item">
+                    <ul id="todo-list">
+                        
+                    </ul>
+                </div>
+            </div>
+        
+            <div id="completed_tasks">
+                <h2>Completed Tasks</h2>
+                <ul id="completed-list">
+                </ul>
+        
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
