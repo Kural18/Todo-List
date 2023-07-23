@@ -80,38 +80,42 @@ function unMarkAsDone(id) {
   logActivity('Un mark as done', logTask);
 }
 
-function updateItem(id) {
-  const index = tasksArray.findIndex(todo => todo.id === id);
-  const logTask = tasksArray[index];
-  //console.log(index);
-  //console.log(tasksArray[index].text);
+function updateSubtask(mainTaskId, subtaskId) {
+  const mainTask = tasksArray.find(task => task.id === mainTaskId);
+  if (mainTask) {
+    const subtaskIndex = mainTask.subtasks.findIndex(subtask => subtask.id === subtaskId);
+    if (subtaskIndex !== -1) {
+      const subtask = mainTask.subtasks[subtaskIndex];
 
-  const liElem = document.querySelectorAll('#todo-list li')[index];
-  console.log(liElem);
-  const divElem = liElem.querySelectorAll('div')[0];
-  const paraElem = divElem.querySelector('p');
-  console.log(paraElem);
-  const inputElement = document.createElement('input');
-  inputElement.type = 'text';
-  inputElement.value = paraElem.textContent;
-  divElem.replaceChild(inputElement, paraElem);
+      const subtaskLiElem = document.querySelectorAll('.subtasks-list li')[subtaskIndex];
+      const subtaskSpanElem = subtaskLiElem.querySelector('span');
+      
+      const subtaskInputElem = document.createElement('input');
+      subtaskInputElem.type = 'text';
+      subtaskInputElem.value = subtask.text;
+      subtaskLiElem.replaceChild(subtaskInputElem, subtaskSpanElem);
 
-  inputElement.addEventListener('input', (event) => {
-    paraElem.textContent = event.target.value;
-  });
-  
-  inputElement.addEventListener('change', (event) => {
-    const updatedText = event.target.value;
-    tasksArray[index].text = updatedText;
-    saveTasksToLocalStorage();
-    divElem.replaceChild(paraElem, inputElement);
-  });
-  
-  inputElement.addEventListener('blur', (event) => {
-    divElem.replaceChild(paraElem, inputElement);
-  });
-  logActivity('Updated', logTask);
+      subtaskInputElem.addEventListener('input', (event) => {
+        subtask.text = event.target.value;
+      });
+
+      subtaskInputElem.addEventListener('change', (event) => {
+        const updatedText = event.target.value;
+        mainTask.subtasks[subtaskIndex].text = updatedText;
+        saveTasksToLocalStorage();
+        display(tasksArray);
+      });
+
+      subtaskInputElem.addEventListener('blur', () => {
+        subtaskLiElem.replaceChild(subtaskSpanElem, subtaskInputElem);
+        saveTasksToLocalStorage();
+        display(tasksArray);
+      });
+    }
+  }
+  logActivity('Updated Subtask of', mainTask);
 }
+
 
 function getTodayDate() {
   const today = new Date();
@@ -141,11 +145,9 @@ function displayCategories() {
 
 function display(tasksToDisplay) {
   list.innerHTML = '';
-
   tasksToDisplay.forEach((task) => {
     const li = document.createElement('li');
     li.className = 'list_items';
-
     const secondDiv = document.createElement('div');
     secondDiv.className = 'second_child_li'
     const categoryDiv = document.createElement('div');
@@ -164,7 +166,7 @@ function display(tasksToDisplay) {
     const textDiv = document.createElement('div');
     textDiv.className = 'list_items_div';
 
-    const para = document.createElement('p');
+    const para = document.createElement('h3');
     para.innerText = task.text;
     textDiv.appendChild(para);
 
@@ -187,7 +189,15 @@ function display(tasksToDisplay) {
     editIcon.className = 'fa fa-edit';
     editButton.appendChild(editIcon);
     editButton.addEventListener('click', function() {
-      updateItem(task.id);
+      alert('Check the input field for tasks');
+      input.value = task.text;
+      getDueDate.value = task.dueDate;
+      getPriority.value = task.priority;
+      getCategory.value = task.category;
+      document.getElementById('tags').value = task.tags.join(', ');
+
+      form.style.display = 'block';
+      deleteItem(task.id);
     });
     divButtons.appendChild(editButton);
 
@@ -200,6 +210,17 @@ function display(tasksToDisplay) {
       markAsDone(task.id);
     });
     divButtons.appendChild(doneButton);
+
+    const reminderButton = document.createElement('button'); // A button that reminds before 2 hours
+    reminderButton.className = 'task_all_buttons reminder-button';
+    const reminderIcon = document.createElement('i');
+    reminderIcon.className = 'fa fa-bell';
+    reminderButton.appendChild(reminderIcon);
+    reminderButton.addEventListener('click', function() {
+      setReminder(task);
+      this.style.display = 'none'; 
+    });
+    divButtons.appendChild(reminderButton);
     
     const subtaskBtn = document.createElement('button');
     subtaskBtn.className = 'task_all_buttons';
@@ -241,7 +262,7 @@ function display(tasksToDisplay) {
       task.subtasks.forEach(subtask => {
         const subtaskLi = document.createElement('li');
         
-        const subtaskCheckbox = document.createElement('input');
+        const subtaskCheckbox = document.createElement('input'); // checkbox to delete subtasks
         subtaskCheckbox.type = 'checkbox';
         subtaskCheckbox.checked = subtask.is_completed;
         subtaskCheckbox.addEventListener('change', function () {
@@ -252,6 +273,16 @@ function display(tasksToDisplay) {
         const subtaskText = document.createElement('span');
         subtaskText.textContent = subtask.text;
         subtaskLi.appendChild(subtaskText);
+
+        const subtaskEditButton = document.createElement('button'); // button to edit subtasks
+        subtaskEditButton.className = 'subtask-all-buttons';
+        const editIcon = document.createElement('i');
+        editIcon.className = 'fa fa-edit';
+        subtaskEditButton.appendChild(editIcon);
+        subtaskEditButton.addEventListener('click', function () {
+          updateSubtask(task.id, subtask.id);
+        });
+        subtaskLi.appendChild(subtaskEditButton);
 
         subtasksList.appendChild(subtaskLi);
       });
@@ -295,6 +326,19 @@ function markOrDeleteSubtask(mainTaskId, subtaskId, isCompleted) {
   }
 }
 
+function setReminder(task) {
+  const dueDate = new Date(task.dueDate);
+  const reminderTime = new Date(dueDate.getTime() - 2 * 60 * 60 * 1000); // 2  hours before the due date
+
+  const currentTime = new Date();
+  const timeToReminder = reminderTime - currentTime;
+  //console.log(timeToReminder);
+  if (timeToReminder > 0) {
+    setTimeout(() => {
+      alert(`Reminder: Task "${task.text}" is due in 2 hours.`);
+    }, timeToReminder);
+  }
+}
 
 function displayCompleted() {
   completedList.innerHTML = '';
@@ -323,12 +367,34 @@ form.addEventListener('submit', function(event) {
 
     var item = document.getElementById('input').value;
     if(item!="") {
+      const dueDate = getDueDateFromInput(item);
+      item = removeDateKeywords(item);
+
+      if (this.getAttribute('data-action') === 'edit') {
+        // Update existing task
+        const updatedTask = {
+          id: task.id,
+          text: item,
+          is_completed: false,
+          priority: getPriority.value || 'low',
+          dueDate: dueDate || getDueDate.value || getTodayDate(),
+          category: getCategory.value || 'Default',
+          tags: getTagsArrayFromInput(),
+          subtasks: task.subtasks
+        };
+  
+        const index = tasksArray.findIndex(todo => todo.id === task.id);
+        tasksArray[index] = updatedTask;
+        saveTasksToLocalStorage();
+        display(tasksArray);
+        logActivity('Updated', updatedTask);
+      } else {
         const newItem = {
           id : id_generator,
           text : item,
           is_completed: false,
           priority: getPriority.value || "low",
-          dueDate: getDueDate.value || getTodayDate(),
+          dueDate: dueDate || getDueDate.value || getTodayDate(),
           category: getCategory.value || 'Default',
           tags: getTagsArrayFromInput(),
           subtasks: []
@@ -347,8 +413,39 @@ form.addEventListener('submit', function(event) {
         display(tasksArray);
         displayCategories();
         logActivity('Added', tasksArray[id_generator-1]);
+      }
     }
 });
+
+function getDueDateFromInput(inputText){
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const lowerCaseInput = inputText.toLowerCase();
+  if (lowerCaseInput.includes('tomorrow')) {
+    return getFormattedDate(tomorrow);
+  } else if (lowerCaseInput.includes('today')) {
+    //console.log("hooo");
+    return getFormattedDate(today);
+  } else if (lowerCaseInput.includes('yesterday')) {
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    return getFormattedDate(yesterday);
+  }
+  return null;
+}
+
+function getFormattedDate(date) {
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+}
+
+function removeDateKeywords(inputText) {
+  return inputText.replace(/by|tomorrow|today|yesterday/gi, '').trim();
+}
 
 function getTagsArrayFromInput() {
   const tagsInputValue = document.getElementById('tags').value;

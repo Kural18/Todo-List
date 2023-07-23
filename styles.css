@@ -5,7 +5,6 @@ html {
   background-repeat: no-repeat;
   background-size: cover;
   min-height: 1000px;
-  font-family: 'helvetica neue';
 }
 
 h1 {
@@ -42,25 +41,30 @@ h1 {
   flex-grow: 10;
 }
 .box {
-  max-width: 650px;
+  max-width: 750px;
   margin: 50px auto;
   background: white;
   border-radius: 5px;
   box-shadow: 5px 5px 15px -5px rgba(0, 0, 0, 0.3);
+  padding: 10px;
 }
 
 #completed_tasks {
-  max-width: 470px;
-  margin: 50px auto;
-  background: white;
-  border-radius: 5px;
-  box-shadow: 5px 5px 15px -5px rgba(0, 0, 0, 0.3);
+  max-width: 750px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-#completed_tasks > h2 {
-  color: green;
-  padding: 20px;
+#completed_tasks h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #007bff;
+  margin: 0 0 15px;
 }
+
 #heading {
   background-color: #FFC857;
   text-align: center;
@@ -72,6 +76,9 @@ h1 {
   align-items: center;
   justify-content: center;
   border-bottom: 1px solid #F1F1F1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 #todo-list {
@@ -82,18 +89,101 @@ h1 {
 
 #completed-list {
   list-style: none;
+  padding: 0;
+}
+
+.completed_items {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.completed_items p {
+  font-size: 16px;
+  color: #333;
+  margin: 0;
+}
+
+.completed_items button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #333;
+}
+
+.completed_items button:hover {
+  color: #007bff;
 }
 
 .list_items {
   display: flex;
   flex-direction: column;
   padding-bottom: 10px;
+  background-color: cyan;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  padding: 15px;
+}
+
+.list_items h3 {
+  margin: 0;
+  font-size: 25px;
+  font-weight: bold;
+  color: #007bff;
 }
 
 .list_items_div {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.div_buttons button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin-right: 5px;
+  font-size: 18px;
+  color: #333;
+}
+
+.div_buttons button:hover {
+  color: #007bff;
+}
+
+.category_name_in_task, .due-date, .subtasks-list {
+  font-size: 14px;
+  color: #666;
+}
+
+.subtasks-list li {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.subtasks-list input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.subtask-all-buttons button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
+  font-size: 14px;
+  color: #333;
+}
+
+.subtask-all-buttons button:hover {
+  color: #007bff;
 }
 
 .completed_items {
@@ -124,16 +214,10 @@ input[type="checkbox"] {
   flex-grow: 2;
 }
 
-.task_all_buttons {
-  flex-grow: 1;
-  text-align: center;
-  font-size: 30px;
-  border: none;
-  background-color: #fff;
-  width: auto;
-  height: auto;
+.subtask-all-buttons {
   margin: 10px;
-  cursor: pointer;
+  background-color: #fff;
+  border: none;
 }
 
 .completed_items > button {
@@ -241,29 +325,86 @@ input[type="text"]:focus {
 
 .filters {
   display: flex;
-  flex-direction: row;
+  align-items: center;
   flex-wrap: wrap;
-  justify-content: space-evenly;
-  border-bottom: 2px solid #000;
+  justify-content: center;
+  width: 600px;
+  margin: 20px auto;
+  padding: 10px;
+  background-color: oldlace;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px oldlace;
+}
+
+.filters > * {
+  margin-right: 20px;
+}
+
+.filters label {
+  margin-right: 10px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.filters input[type="date"], .filters input[type="text"], .filters select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  font-size: 14px;
+}
+
+.filters select {
+  width: 120px;
+}
+
+.filters button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filters button:hover {
+  background-color: #0056b3;
 }
 
 .Search_bar {
   display: flex;
-  flex-direction: row;
-  justify-content:space-between;
-  border-bottom: 2px solid #000;
+  align-items: center;
+  width: 500px;
+  margin: 20px auto;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);;
 }
 
-.Search_bar > input {
-  text-align: center;
-  flex-grow: 2;
+.Search_bar input[type="text"] {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  font-size: 14px;
 }
 
-.Search_bar > button {
-  margin: 10px;
-  width: 150px;
-  height: 40px;
-  flex-grow: 1;
+.Search_bar button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.Search_bar button:hover {
+  background-color: #0056b3;
 }
 
 .filters > * {
@@ -273,13 +414,45 @@ input[type="text"]:focus {
 
 .club_sort_backlogs {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  width: 600px;
+  margin: 20px auto;
+  padding: 10px;
+  background-color: floralwhite;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+club_sort_backlogs label {
+  margin-right: 10px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.club_sort_backlogs select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  font-size: 14px;
+}
+
+.club_sort_backlogs button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.club_sort_backlogs button:hover {
+  background-color: #0056b3;
 }
 
 .sort {
-  text-align: end;
   margin: 10px;
 }
 
@@ -288,9 +461,15 @@ input[type="text"]:focus {
 }
 
 #toggleLogsBtn {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
   margin-bottom: 15px;
-  margin-left: 30px;
-  padding: 8px;
+  margin-left: 25px;
 }
 
 .btn {
@@ -320,4 +499,144 @@ input[type="text"]:focus {
   list-style: none;
 }
 
+.item select, .item input[type="date"] {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  font-size: 14px;
+}
 
+
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Styles for screens with a maximum width of 915px */
+@media (max-width: 915px) {
+
+  .container {
+    flex-direction: column-reverse;
+  }
+
+  .left_box {
+    max-width: 100%;
+    margin: 50px auto;
+  }
+
+  .box,
+  #completed_tasks {
+    max-width: 100%;
+    margin: 50px auto;
+  }
+
+  .left-half,
+  .right-half {
+    flex-grow: 1;
+  }
+
+  .Search_bar,
+  .filters,
+  .club_sort_backlogs {
+    width: 90%;
+    max-width: 600px;
+  }
+
+  .category_name_in_task,
+  .due-date,
+  .subtasks-list,
+  .completed_items > p,
+  .list_items_div > p {
+    font-size: 12px;
+  }
+
+  .subtasks-list li {
+    margin-top: 3px;
+  }
+
+  .completed_items p {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .list_items h3 {
+    font-size: 20px;
+  }
+
+  .list_items_div {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .div_buttons button,
+  .subtask-all-buttons button,
+  .completed_items button {
+    font-size: 14px;
+  }
+
+  .subtask-all-buttons {
+    margin: 5px;
+  }
+
+  .add_button {
+    min-height: 40px;
+    width: 40px;
+    font-size: 24px;
+  }
+
+  input[type="text"] {
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .c1_taskfunc > input[type="text"] {
+    width: 100px;
+  }
+
+  #category-list > li {
+    padding: 8px 8px;
+    font-size: 1rem;
+  }
+
+  .category_name_in_task {
+    font-size: 12px;
+  }
+
+  .filters input[type="date"],
+  .filters input[type="text"],
+  .filters select {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .filters label,
+  .club_sort_backlogs label {
+    font-size: 12px;
+  }
+
+  .filters button,
+  .club_sort_backlogs button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .sort,
+  .backlogs {
+    margin: 5px;
+  }
+
+  #toggleLogsBtn {
+    padding: 6px 12px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    margin-left: 15px;
+  }
+
+}
