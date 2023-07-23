@@ -346,7 +346,7 @@ function displayCompleted() {
   completedArray.forEach(task => {
     const li = document.createElement('li');
     li.className = 'completed_items';
-    const para = document.createElement('p');
+    const para = document.createElement('h3');
     para.textContent = task.text;
     li.appendChild(para);
 

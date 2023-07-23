@@ -640,3 +640,17 @@ h1, h2, h3, h4, h5, h6 {
   }
 
 }
+
+
+/* Styles for screens with a maximum width of 730px */
+@media (max-width: 915px) {
+
+  .task_functions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .task_functions > * {
+    margin-bottom: 10px;
+  }
+}
