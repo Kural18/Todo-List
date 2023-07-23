@@ -28,7 +28,10 @@ h1 {
 
 .left_box > h2 {
   padding: 20px;
-
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #333;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .left-half {
@@ -36,7 +39,7 @@ h1 {
 }
 
 .right-half {
-  flex-grow: 8;
+  flex-grow: 10;
 }
 .box {
   max-width: 650px;
@@ -121,7 +124,7 @@ input[type="checkbox"] {
   flex-grow: 2;
 }
 
-.div_buttons > button {
+.task_all_buttons {
   flex-grow: 1;
   text-align: center;
   font-size: 30px;
@@ -173,6 +176,10 @@ input[type="text"] {
   width: 313px;
 }
 
+.c1_taskfunc > input[type="text"] {
+  width: 150px;
+}
+ 
 input[type="text"]:focus {
   outline: none;
   box-shadow: inset 0 -3px 0 0 #fff;
@@ -203,8 +210,15 @@ input[type="text"]:focus {
 
 #category-list > li {
   padding: 10px 10px;
-  font-size: 20px;
-  border-bottom: 1px solid #ccc;
+  margin-bottom: 8px;
+  color: #555;
+  font-size: 1.2rem;
+  font-family: 'Roboto', sans-serif;
+}
+
+#category-list li:hover {
+  color: #007bff;
+  cursor: pointer;
 }
 
 .category_name_in_task{
@@ -233,7 +247,77 @@ input[type="text"]:focus {
   border-bottom: 2px solid #000;
 }
 
+.Search_bar {
+  display: flex;
+  flex-direction: row;
+  justify-content:space-between;
+  border-bottom: 2px solid #000;
+}
+
+.Search_bar > input {
+  text-align: center;
+  flex-grow: 2;
+}
+
+.Search_bar > button {
+  margin: 10px;
+  width: 150px;
+  height: 40px;
+  flex-grow: 1;
+}
+
 .filters > * {
   margin-bottom: 10px;
   margin-top: 10px;
 }
+
+.club_sort_backlogs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.sort {
+  text-align: end;
+  margin: 10px;
+}
+
+.backlogs {
+  margin: 10px;
+}
+
+#toggleLogsBtn {
+  margin-bottom: 15px;
+  margin-left: 30px;
+  padding: 8px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff; 
+  color: #fff; 
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #0056b3; 
+}
+
+
+.subtasks-list {
+  list-style: none;
+}
+
+

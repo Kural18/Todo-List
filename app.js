@@ -1,6 +1,7 @@
 var tasksArray = [];
 var completedArray = [];
 var categoriesArray = [];
+var activityLogs = [];
 
 var form = document.getElementById('input-form');
 var list = document.getElementById('todo-list');
@@ -10,8 +11,11 @@ var getDueDate = document.getElementById('inputDueDate');
 var getPriority = document.getElementById('priority-dropdown');
 var getCategory = document.getElementById('category');
 var categoryList = document.getElementById('category-list');
+const searchInput = document.getElementById('searchInput');
+const searchButton = document.getElementById('searchButton');
 
 var id_generator = 0;
+var subtask_id_generator = 0;
 
 function saveTasksToLocalStorage() {
   localStorage.setItem('tasksArray', JSON.stringify(tasksArray));
@@ -22,15 +26,20 @@ function saveCategoriesToLocalStorage() {
   localStorage.setItem('categoriesArray', JSON.stringify(categoriesArray));
 }
 
+function saveActivitiesToLocalStorage() {
+  localStorage.setItem('activityLogs', JSON.stringify(activityLogs));
+}
+
 function deleteItem(id) {
   const index = tasksArray.findIndex(todo => todo.id === id);
+  const deletedTask = tasksArray[index];
   if (index > -1) {
     tasksArray.splice(index, 1);
   }
   saveTasksToLocalStorage();
   display(tasksArray);
 
-  const deletedCategory = deletedTask.category;
+  const deletedCategory = deletedTask.text;
   const checkDuplicate = tasksArray.some(task => task.category === deletedCategory);
 
   if (!checkDuplicate) {
@@ -38,10 +47,12 @@ function deleteItem(id) {
     displayCategories(); 
     display(tasksArray);
   }
+  logActivity('Deleted', deletedTask);
 }
 
 function markAsDone(id) {
   const index = tasksArray.findIndex(todo => todo.id === id);
+  const logTask = tasksArray[index];
   if (index > -1) {
     const completedTask = tasksArray[index];
     tasksArray[index].is_completed = true;
@@ -51,10 +62,12 @@ function markAsDone(id) {
     display(tasksArray);
     displayCompleted();
   }
+  logActivity('Mark As Done', logTask);
 }
 
 function unMarkAsDone(id) {
   const index = completedArray.findIndex(todo => todo.id === id);
+  const logTask = tasksArray[index];
   if (index > -1) {
     const unDoneTask = completedArray[index];
     completedArray[index].is_completed = false;
@@ -64,20 +77,24 @@ function unMarkAsDone(id) {
     display(tasksArray);
     displayCompleted();
   }
+  logActivity('Un mark as done', logTask);
 }
 
 function updateItem(id) {
   const index = tasksArray.findIndex(todo => todo.id === id);
+  const logTask = tasksArray[index];
   //console.log(index);
   //console.log(tasksArray[index].text);
 
   const liElem = document.querySelectorAll('#todo-list li')[index];
-  const paraElem = liElem.querySelector('p');
+  console.log(liElem);
+  const divElem = liElem.querySelectorAll('div')[0];
+  const paraElem = divElem.querySelector('p');
   console.log(paraElem);
   const inputElement = document.createElement('input');
   inputElement.type = 'text';
   inputElement.value = paraElem.textContent;
-  liElem.replaceChild(inputElement, paraElem);
+  divElem.replaceChild(inputElement, paraElem);
 
   inputElement.addEventListener('input', (event) => {
     paraElem.textContent = event.target.value;
@@ -85,16 +102,15 @@ function updateItem(id) {
   
   inputElement.addEventListener('change', (event) => {
     const updatedText = event.target.value;
-    liElem.replaceChild(paraElem, inputElement);
-    if (updatedText !== paraElem.textContent) {
-      tasksArray[index].text = updatedText;
-      saveTasksToLocalStorage();
-    }
+    tasksArray[index].text = updatedText;
+    saveTasksToLocalStorage();
+    divElem.replaceChild(paraElem, inputElement);
   });
   
   inputElement.addEventListener('blur', (event) => {
-    liElem.replaceChild(paraElem, inputElement);
+    divElem.replaceChild(paraElem, inputElement);
   });
+  logActivity('Updated', logTask);
 }
 
 function getTodayDate() {
@@ -122,11 +138,11 @@ function displayCategories() {
   });
 }
 
+
 function display(tasksToDisplay) {
   list.innerHTML = '';
 
   tasksToDisplay.forEach((task) => {
-    console.log('hii');
     const li = document.createElement('li');
     li.className = 'list_items';
 
@@ -140,6 +156,10 @@ function display(tasksToDisplay) {
     dueDateDiv.innerText = `Due Date: ${task.dueDate}`; 
     dueDateDiv.className = 'due-date';
     secondDiv.appendChild(dueDateDiv);
+    const tagsDiv = document.createElement('div');
+    tagsDiv.innerText = `Tags: `;
+    task.tags.forEach((tag) => tagsDiv.innerText +=(tag + ', '));
+    secondDiv.appendChild(tagsDiv);
 
     const textDiv = document.createElement('div');
     textDiv.className = 'list_items_div';
@@ -149,9 +169,10 @@ function display(tasksToDisplay) {
     textDiv.appendChild(para);
 
     const divButtons = document.createElement('div');
-    divButtons.className = 'div_buttons'
+    divButtons.className = 'div_buttons';
 
     const deleteButton = document.createElement('button'); // a button to delete tasks from the todo list
+    deleteButton.className = 'task_all_buttons'
     const deleteIcon = document.createElement('i');
     deleteIcon.className = 'fa fa-trash';
     deleteButton.appendChild(deleteIcon);
@@ -161,6 +182,7 @@ function display(tasksToDisplay) {
     divButtons.appendChild(deleteButton);
 
     const editButton = document.createElement('button'); // a button to edit tasks from the todo list
+    editButton.className = 'task_all_buttons';
     const editIcon = document.createElement('i');
     editIcon.className = 'fa fa-edit';
     editButton.appendChild(editIcon);
@@ -170,6 +192,7 @@ function display(tasksToDisplay) {
     divButtons.appendChild(editButton);
 
     const doneButton = document.createElement('button'); // a button to mark tasks as done
+    doneButton.className = 'task_all_buttons';
     const doneIcon = document.createElement('i');
     doneIcon.className = 'fa fa-check';
     doneButton.appendChild(doneIcon);
@@ -177,13 +200,99 @@ function display(tasksToDisplay) {
       markAsDone(task.id);
     });
     divButtons.appendChild(doneButton);
-    textDiv.appendChild(divButtons);
-    li.appendChild(textDiv);
     
-    li.appendChild(secondDiv);
+    const subtaskBtn = document.createElement('button');
+    subtaskBtn.className = 'task_all_buttons';
+    const addIcon = document.createElement('i');
+    addIcon.className = 'fa fa-plus';
+    subtaskBtn.appendChild(addIcon);
+    subtaskBtn.addEventListener('click', function() {
+      const subtaskInput = document.createElement('input');
+      subtaskInput.type = 'text';
+      subtaskInput.placeholder = 'Enter subtask';
+      subtaskInput.className = 'subtask-input';
 
+      const subtaskSubmitBtn = document.createElement('button');
+      subtaskSubmitBtn.textContent = 'Submit';
+      subtaskSubmitBtn.className = 'btn btn-primary';
+      subtaskSubmitBtn.addEventListener('click', function() {
+        const subtaskText = subtaskInput.value.trim();
+        if (subtaskText !== '') {
+          addSubtask(task.id, subtaskText);
+          li.removeChild(subtaskInput);
+          li.removeChild(subtaskSubmitBtn);
+        }
+      });
+
+      divButtons.appendChild(subtaskInput);
+      divButtons.appendChild(subtaskSubmitBtn);
+    });
+    divButtons.appendChild(subtaskBtn);
+    textDiv.appendChild(divButtons);
+    
+    li.appendChild(textDiv);
+    li.appendChild(secondDiv);
     list.appendChild(li);
+
+    if (task.subtasks.length > 0) {
+      const subtasksList = document.createElement('ul');
+      subtasksList.className = 'subtasks-list';
+
+      task.subtasks.forEach(subtask => {
+        const subtaskLi = document.createElement('li');
+        
+        const subtaskCheckbox = document.createElement('input');
+        subtaskCheckbox.type = 'checkbox';
+        subtaskCheckbox.checked = subtask.is_completed;
+        subtaskCheckbox.addEventListener('change', function () {
+          markOrDeleteSubtask(task.id, subtask.id, this.checked);
+        });
+        subtaskLi.appendChild(subtaskCheckbox);
+
+        const subtaskText = document.createElement('span');
+        subtaskText.textContent = subtask.text;
+        subtaskLi.appendChild(subtaskText);
+
+        subtasksList.appendChild(subtaskLi);
+      });
+
+      li.appendChild(subtasksList);
+    }
   });
+}
+
+
+function addSubtask(mainTaskId, subtaskText) {
+  const mainTask = tasksArray.find(task => task.id === mainTaskId);
+  if (mainTask) {
+    const subtask = {
+      id: subtask_id_generator,
+      text: subtaskText,
+      is_completed: false 
+    };
+    mainTask.subtasks.push(subtask);
+    subtask_id_generator++; 
+    saveTasksToLocalStorage();
+    display(tasksArray);
+    logActivity('Subtask Added', mainTask);
+  }
+}
+
+function markOrDeleteSubtask(mainTaskId, subtaskId, isCompleted) {
+  const mainTask = tasksArray.find(task => task.id === mainTaskId);
+  if (mainTask) {
+    const subtaskIndex = mainTask.subtasks.findIndex(subtask => subtask.id === subtaskId);
+    if (subtaskIndex !== -1) {
+      if (isCompleted) {
+        mainTask.subtasks.splice(subtaskIndex, 1);
+      } else {
+        mainTask.subtasks[subtaskIndex].is_completed = false;
+      }
+      saveTasksToLocalStorage();
+      display(tasksArray);
+      logActivity('Subtask Marked As Undone', mainTask);
+    }
+  }
 }
 
 
@@ -220,7 +329,9 @@ form.addEventListener('submit', function(event) {
           is_completed: false,
           priority: getPriority.value || "low",
           dueDate: getDueDate.value || getTodayDate(),
-          category: getCategory.value || 'Default'
+          category: getCategory.value || 'Default',
+          tags: getTagsArrayFromInput(),
+          subtasks: []
         }
         id_generator++;
         tasksArray.push(newItem);
@@ -229,13 +340,20 @@ form.addEventListener('submit', function(event) {
         getDueDate.value = '';
         getPriority.value = 'low';
         getCategory.value = '';
+        document.getElementById('tags').value = '';
         
         categoriesArray = Array.from(new Set(tasksArray.map(task => task.category)));
 
         display(tasksArray);
         displayCategories();
+        logActivity('Added', tasksArray[id_generator-1]);
     }
 });
+
+function getTagsArrayFromInput() {
+  const tagsInputValue = document.getElementById('tags').value;
+  return tagsInputValue.split(',').map(tag => tag.trim());
+}
 
 
 function applyFilters() {
@@ -254,7 +372,6 @@ function applyFilters() {
     return dueDateMatch && categoryMatch && priorityMatch;
   });
 
-  console.log("hii");
   display(filteredTasks);
 }
 
@@ -267,13 +384,122 @@ function unfilterTasks() {
   display(tasksArray);
 }
 
-document.getElementById('filterBtn').addEventListener('click', function() {
-  applyFilters();
+function sortTasks(sortOption) {
+  switch (sortOption) {
+    case 'dueDate':
+      tasksArray.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+      break;
+    case 'priority':
+      tasksArray.sort((a, b) => {
+        const priorityOrder = { low: 1, medium: 2, high: 3 };
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
+      });
+      break;
+    case 'Created first':
+      tasksArray.sort((a, b) => a.id - b.id);
+      break;
+    default:
+      tasksArray.sort((a, b) => a.id - b.id);
+  }
+}
+
+function displayBacklogs() {
+  const today = new Date();
+  const filteredTasks = tasksArray.filter((task) => {
+    const dueDate = new Date(task.dueDate);
+    return !task.is_completed && dueDate < today;
+  });
+
+  display(filteredTasks);
+}
+
+function displayActivityLogs() {
+  const activityLogsList = document.getElementById('activity-logs');
+  activityLogsList.innerHTML = '';
+  activityLogs.forEach(log => {
+    const li = document.createElement('li');
+    li.textContent = `${log.timestamp} - ${log.action}: ${log.task.text}`;
+    activityLogsList.appendChild(li);
+  });
+}
+
+function logActivity(action, task) {
+  const timestamp = new Date().toLocaleString();
+  const activity = {
+    timestamp: timestamp,
+    action: action,
+    task: task
+  };
+  activityLogs.push(activity);
+  displayActivityLogs();
+  saveActivitiesToLocalStorage();
+}
+
+function toggleActivityLogs() {
+  const activityLogsList = document.getElementById('activity-logs');
+  const logsButton = document.getElementById('toggleLogsBtn');
+  if (activityLogsList.style.display === 'none') {
+    activityLogsList.style.display = 'block';
+    logsButton.textContent = 'Hide Activity Logs';
+  } else {
+    activityLogsList.style.display = 'none';
+    logsButton.textContent = 'Show Activity Logs';
+  }
+}
+
+function handleSearch() {
+  const searchText = searchInput.value.toLowerCase().trim();
+  const filteredTasks = tasksArray.filter(task => {
+  const taskName = task.text.toLowerCase();
+  const subtask = task.subtasks.map(subtask => subtask.text.toLowerCase()).join(' ');
+  const tags = task.tags.join(' ').toLowerCase();
+  const taskMatches = taskName === searchText;
+  const subtaskMatches = subtask.includes(searchText);
+  const tagsMatches = tags.includes(searchText);
+  return taskMatches || subtaskMatches || tagsMatches;
 });
 
-document.getElementById('unfilterBtn').addEventListener('click', function() {
-  unfilterTasks();
+  display(filteredTasks);
+}
+
+document.getElementById('filterBtn').addEventListener('click', function() {
+  if(filterBtn.textContent === 'Filter'){
+    applyFilters();
+    filterBtn.textContent = 'View All Tasks';
+  } else {
+    display(tasksArray);
+    filterBtn.textContent = 'Filter';
+  }
 });
+
+document.getElementById('sortBtn').addEventListener('click', function() {
+  const sortOption = document.getElementById('sort-dropdown').value;
+  sortTasks(sortOption);
+  display(tasksArray);
+});
+
+document.getElementById('viewBacklogsBtn').addEventListener('click', function() {
+  const viewBacklogsBtn = document.getElementById('viewBacklogsBtn');
+  if (viewBacklogsBtn.textContent === 'View Backlogs') {
+    displayBacklogs();
+    viewBacklogsBtn.textContent = 'View All Tasks';
+  } else {
+    display(tasksArray); 
+    viewBacklogsBtn.textContent = 'View Backlogs';
+  }
+});
+
+searchButton.addEventListener('click', function(){
+  if(searchButton.textContent === 'Search'){
+    searchButton.textContent = 'Cancel';
+    handleSearch();
+  } else {
+    searchButton.textContent = 'Search';
+    display(tasksArray);
+  }
+});
+
+document.getElementById('toggleLogsBtn').addEventListener('click', toggleActivityLogs);
 
 function getTasksFromLocalStorage() {
   const tasksArrayString = localStorage.getItem('tasksArray');
@@ -291,8 +517,17 @@ function getTasksFromLocalStorage() {
   }
 }
 
+function loadActivityLogsFromLocalStorage() {
+  const activityLogsString = localStorage.getItem('activityLogs');
+  if (activityLogsString) {
+    activityLogs = JSON.parse(activityLogsString);
+    displayActivityLogs();
+  }
+}
+
 function loadDataFromLocalStorage() {
   getTasksFromLocalStorage();
+  loadActivityLogsFromLocalStorage();
 
   // Initialize categoriesArray with unique categories from tasksArray
   categoriesArray = Array.from(new Set(tasksArray.map(task => task.category)));

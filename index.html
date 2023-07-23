@@ -6,6 +6,8 @@
     <title>To-Do List</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Roboto&display=swap" rel="stylesheet">
+
 </head>
 <body>
     <div class="container">
@@ -15,6 +17,11 @@
                 <h2>Categories</h2>
                 <ul id="category-list">
                 </ul>
+            </div>
+            <div class="left_box">
+                <h2>Activity Logs</h2>
+                <button id="toggleLogsBtn">Show Activity Logs</button>
+                <ul id="activity-logs" style="display: none;"></ul>
             </div>
         </div>
 
@@ -45,6 +52,9 @@
                               </select>
                         </div>
                         <div class="c1_taskfunc">
+                            <input type="text" id="tags" placeholder="Tags (separated by commas)">
+                        </div>
+                        <div class="c1_taskfunc">
                             <button type="submit" name="button" class="add_button">+</button>
                         </div>
                         
@@ -54,6 +64,11 @@
             </div>
 
             <div class="box">
+
+                <div class="Search_bar">
+                    <input type="text" id="searchInput" placeholder="Search tasks...">
+                    <button id="searchButton">Search</button>
+                </div>
                 
                 <div class="filters">
                     <label for="dueDateFrom">From:</label>
@@ -74,8 +89,21 @@
                     </select>
                     
                     <button id="filterBtn">Filter</button>
-                    <button id="unfilterBtn">Unfilter</button>
-                  </div>
+                </div>
+                <div class="club_sort_backlogs">
+                    <div class="sort">
+                        <label for="sort-dropdown">Sort By:</label>
+                        <select id="sort-dropdown">
+                          <option value="dueDate">Due Date</option>
+                          <option value="priority">Priority</option>
+                          <option value="Created first">Created First</option>
+                        </select>
+                        <button id="sortBtn">Sort</button>
+                      </div>
+                      <div class="backlogs">
+                        <button id="viewBacklogsBtn">View Backlogs</button>
+                      </div>
+                </div>
 
                 <div class="item">
                     <ul id="todo-list">
